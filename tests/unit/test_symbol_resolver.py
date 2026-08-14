@@ -200,9 +200,10 @@ def test_resolve_config_deeply_nested_override():
 def test_resolve_config_with_real_files():
     """Integration: resolve against actual YAML files."""
     cfg = load_and_resolve_for_symbol("XAUTUSDT")
-    # Base values (XAUTUSDT has no overrides)
+    # Base values preserved
     assert cfg["regime_parameters"]["trend"]["trend_intensity_min_expansion"] == 0.08
-    assert cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.18
+    # XAUTUSDT override lowers cvd_divergence_tick_delta from base 0.18
+    assert cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.12
     # Other base values preserved
     assert cfg["regime_parameters"]["volatility"]["volatility_extreme_ratio"] == 2.2
     assert cfg["sniper"]["probes"]["cvd_growth_significance_ratio"] == 1.4
@@ -212,7 +213,7 @@ def test_load_and_resolve_btc_with_overrides():
     cfg = load_and_resolve_for_symbol("BTCUSDT")
     # BTC overrides push values away from the base
     assert cfg["regime_parameters"]["trend"]["trend_intensity_min_expansion"] == 0.12
-    assert cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.25
+    assert cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.08
 
 
 # ── Data flow: full config pipeline ──────────────────────────────────────────
@@ -238,9 +239,9 @@ def test_full_config_pipeline_session():
     t = load_temporal_config(full)
     k = load_risk_config(full)
 
-    # Verify — XAUTUSDT uses base values (no overrides)
+    # Verify — XAUTUSDT: base values + overrides
     assert r.trend_intensity_min_expansion == 0.08
-    assert r.trend_intensity_threshold == 0.2
+    assert r.trend_intensity_threshold == 0.25
     assert t.min_trade_velocity == 0.4
     assert k.max_holding_hours == 72.0
 
@@ -249,9 +250,9 @@ def test_full_config_pipeline_evolution():
     """Simulate the run_evolution.py data flow."""
     cfg = load_and_resolve_for_symbol("XAUTUSDT")
 
-    # XAUTUSDT uses base values (no overrides)
+    # XAUTUSDT: base values + overrides
     assert cfg["regime_parameters"]["trend"]["trend_intensity_min_expansion"] == 0.08
-    assert cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.18
+    assert cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.12
     assert "strategy_intent" in cfg  # from strategy_config
 
 
@@ -266,8 +267,8 @@ def test_full_config_pipeline_sniper():
     strategy = resolve_config(strategy, "XAUTUSDT")
     global_cfg = resolve_config(global_cfg, "XAUTUSDT")
 
-    # Base values (XAUTUSDT has no overrides)
-    assert global_cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.18
+    # XAUTUSDT: base values + overrides
+    assert global_cfg["sniper"]["signal_stack"]["thresholds"]["cvd_divergence_tick_delta"] == 0.12
     assert strategy["regime_parameters"]["trend"]["trend_intensity_min_expansion"] == 0.08
     # Non-overridden sniper values
     assert global_cfg["sniper"]["probes"]["cvd_growth_significance_ratio"] == 1.4
@@ -292,9 +293,9 @@ def test_loaders_work_with_resolved_config():
     a = load_audit_config(cfg)
     v = load_visual_config(cfg)
 
-    # Base values and overrides (XAUTUSDT overrides stop_loss_buffer_min to 1.5)
+    # Base values and overrides (XAUTUSDT overrides stop_loss_buffer_min to 1.6)
     assert r.trend_intensity_min_expansion == 0.08
-    assert k.stop_loss_buffer_min == 1.5
+    assert k.stop_loss_buffer_min == 1.6
     assert t.min_trade_velocity == 0.4
     assert a.mae_threshold_pinpoint == 20.0
     assert v.render_dpi == 120
