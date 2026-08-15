@@ -26,7 +26,7 @@ llm:
     model: "gemini-3.5-flash" # gemini-3.5-flash
   deepseek:
     base_url: "https://api.deepseek.com"
-    model: "deepseek-v4-flash"  # deepseek-v4-pro deepseek-v4-flash
+    model: "deepseek-v4-pro"  # deepseek-v4-pro deepseek-v4-flash
 
   agents:
     session:
