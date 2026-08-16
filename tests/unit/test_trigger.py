@@ -201,3 +201,14 @@ class TestConfluenceEngine:
         score, direction, trigger = engine.evaluate(signals, "ranging")
         assert score == pytest.approx(0.0)
         assert trigger is False
+
+
+def test_sniper_trigger_initialization_with_symbol_override():
+    """SniperTrigger initialized with symbol alone should resolve per-symbol overrides."""
+    from src.sniper.trigger import SniperTrigger
+    trigger_btc = SniperTrigger(symbol="BTCUSDT")
+    # BTC overrides trigger_threshold to 0.36 and cvd_divergence_tick_delta to 0.08
+    thresholds = trigger_btc.sniper_cfg.get("signal_stack", {}).get("thresholds", {})
+    assert thresholds.get("cvd_divergence_tick_delta") == 0.08
+    assert trigger_btc.sniper_cfg.get("signal_stack", {}).get("trigger_threshold") == 0.36
+

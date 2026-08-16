@@ -289,6 +289,16 @@ class SniperTrigger:
         from src.utils.pipeline_utils import load_combined_config, load_global_config
         self.strat_cfg = strategy_cfg if strategy_cfg is not None else load_combined_config()
         self.global_cfg = global_cfg if global_cfg is not None else load_global_config()
+
+        # Apply per-symbol overrides if symbol is provided and configs were loaded as base
+        if self.symbol:
+            from src.config.symbol_resolver import resolve_config, is_symbol_configured
+            if is_symbol_configured(self.symbol):
+                if strategy_cfg is None:
+                    self.strat_cfg = resolve_config(self.strat_cfg, self.symbol)
+                if global_cfg is None:
+                    self.global_cfg = resolve_config(self.global_cfg, self.symbol)
+
         self.regime_cfg = self.strat_cfg['regime_parameters']
         self.sniper_cfg = self.global_cfg['sniper']
 

@@ -207,6 +207,9 @@ def validate_symbol_configs() -> List[str]:
 
     required_params = {"precision_qty", "precision_price", "min_order_qty", "sl_slippage_buffer"}
 
+    from src.utils.pipeline_utils import load_combined_config
+    base_keys = set(load_combined_config().keys())
+
     for symbol, cfg in sym_cfg.items():
         if not isinstance(cfg, dict):
             errors.append(f"[{symbol}] entry is not a dict (got {type(cfg).__name__})")
@@ -233,6 +236,10 @@ def validate_symbol_configs() -> List[str]:
                 errors.append(
                     f"[{symbol}] overrides.{section} must be a dict, "
                     f"got {type(section_overrides).__name__} — override will be ignored"
+                )
+            elif section not in base_keys:
+                errors.append(
+                    f"[{symbol}] overrides.{section} does not match any base config section — override will be ignored"
                 )
 
     return errors

@@ -437,3 +437,23 @@ def test_validate_symbol_configs_non_dict_section():
     with patch("src.config.symbol_resolver.load_symbol_config", return_value=bad_config):
         errors = validate_symbol_configs()
         assert any("regime_parameters" in e for e in errors)
+
+
+def test_validate_symbol_configs_unknown_section():
+    """Override section not present in base config should produce an error."""
+    from src.config.symbol_resolver import validate_symbol_configs
+    from unittest.mock import patch
+
+    bad_config = {
+        "BADSYMBOL": {
+            "precision_qty": 4,
+            "precision_price": 1,
+            "min_order_qty": 0.001,
+            "sl_slippage_buffer": 10.0,
+            "overrides": {"unknown_invalid_section": {}},
+        },
+    }
+    with patch("src.config.symbol_resolver.load_symbol_config", return_value=bad_config):
+        errors = validate_symbol_configs()
+        assert any("unknown_invalid_section" in e for e in errors)
+
