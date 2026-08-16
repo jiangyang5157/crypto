@@ -47,7 +47,7 @@ llm:
 binary_star:
   system_instruction: "config/prompts/binary_star.md"
   max_rounds: 2
-  confidence_threshold: 42
+  confidence_threshold: 60
 
 # ═══════════════════════════════════════════════════════════════════════════
 # SNIPER — Monitoring Daemon Trigger Sensitivity
