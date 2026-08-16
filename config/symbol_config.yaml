@@ -85,4 +85,4 @@ BTCUSDT:
         cooldown:
           stacked_break_count: 4   # 提到 4 防止 ranging 40min cooldown 形同虚设。
         gate:
-          min_active_non_trend: 2   # 从 base 1 提高。BTC 72% wakes 在 ranging，45% 是单信号，71% 结果 NEUTRAL。≥2 同向信号才放行，大幅降低 LLM 浪费。
+          min_active_non_trend: 3   # 从 base 1 提高。BTC 72% wakes 在 ranging，45% 是单信号，71% 结果 NEUTRAL。≥2 同向信号才放行，大幅降低 LLM 浪费。
