@@ -30,7 +30,7 @@ XAUTUSDT:
         trend_intensity_threshold: 0.25
       structural:
         breakout_frontrun_atr: 0.12
-        poc_gravity_atr_distance: 0.5
+        poc_gravity_atr_distance: 0.8
       micro_sentiment:
         cvd_intensity_threshold: 0.20   # 从 0.25 降下来。XAUT |CVD| P75=0.15, P90=0.18，0.25 已是 P95 太保守。对齐 P85 作为"显著"基准
         cvd_intensity_extreme: 0.36   # 统一到低簇边界。XAUT |CVD| 双峰：低簇 0.07-0.36 / 高簇 0.62-0.74。0.36 正好卡边界，对齐 sniper cvd_extreme_threshold。

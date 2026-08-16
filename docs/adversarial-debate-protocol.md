@@ -281,7 +281,7 @@ graph TD
         ENTRY -->|and| SL
     end
 
-    subgraph "MOMENTUM EXEMPTION"
+    subgraph "KINETIC SHIELD EXEMPTION"
         COND1[poc_dist_atr > poc_gravity_atr_distance]
         COND2[IS_TREND_STRONG = TRUE]
         COND1 -->|AND| COND2

@@ -154,8 +154,8 @@ regime_parameters:
 risk_management:
 
   # --- Base RR Thresholds ---
-  min_rr_ranging: 1.2          # Minimum Risk-Reward for ranging (Mean Reversion)
-  min_rr_trending: 1.4         # Minimum Risk-Reward for trending
+  min_rr_ranging: 1.0          # Minimum Risk-Reward for ranging (Mean Reversion)
+  min_rr_trending: 1.2         # Minimum Risk-Reward for trending
   chaos_rr_discount: 0.35      # [CHAOS] RR tolerance discount (0.35 = 35% reduction)
 
   # --- Stop-Loss Protection ---
@@ -184,7 +184,7 @@ temporal_parameters:
   # 动态时间膨胀系数 (Dilation)
   dilation:
     temporal_dilation_highway: 1.2 # [冗余 20%]：动能极强，价格走直线。只需极小缓冲来覆盖回踩和滑点。
-    temporal_dilation_standard: 1.5 # [冗余 50%]：常态市场进三退二。物理时间 20 小时，脚本追踪 30 小时，给足结构发育的时间。
+    temporal_dilation_standard: 1.0 # [冗余 50%]：常态市场进三退二。物理时间 20 小时，脚本追踪 30 小时，给足结构发育的时间。
     temporal_dilation_dead_water: 2.0 # [冗余 100%]：死水区价格黏性极大，全是毛刺。物理上 10 小时的路程，需要 20 小时才能"磨"到。
     temporal_dilation_climax: 1.0 # [冗余 0%]：极端波动，非生即死。不需要缓冲，如果物理预期时间内没打到目标，说明逻辑已经破产。
 
