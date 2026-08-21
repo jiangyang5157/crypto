@@ -44,6 +44,7 @@ def build_messages(
                     "image_url": {"url": data_uri},
                 })
                 messages.append({"role": "user", "content": content_parts})
+                logger.info("injected VisualPart into OpenAI message | label=%s | size_bytes=%d", item.label, len(item.data))
             else:
                 # provider doesn't support vision — skip VisualPart entirely
                 # (all chart data is already in the observation JSON)
