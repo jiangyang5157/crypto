@@ -110,7 +110,7 @@ When history contains specific veto tags, apply these technical repair protocols
     → Execute Mean-Reversion DLE targeting POC.
   ELSE IF institutional flow is confirmed (`IS_TREND_STRONG`) or flow aligns:
     → IF full confirmation (`IS_TREND_STRONG` AND `HAS_CVD_MOMENTUM` AND `HAS_VOLUME_SURGE`): execute **Momentum Surge Entry** (per **MOMENTUM SURGE EXEMPTION**); Shallow Pullback DLE is PROHIBITED here.
-    → ELSE: Execute Shallow Pullback DLE; do not force a return to distal POC.
+    → ELSE: Execute Shallow Pullback DLE if `IS_OVEREXTENDING` is FALSE; do not force a return to distal POC.
   ELSE:
     → Output "NEUTRAL" (counter-trend or no valid entry path).
 
