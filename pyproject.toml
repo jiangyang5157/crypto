@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "binary-star"
-version = "26.8.16"
+version = "26.8.22"
 description = "AI-driven crypto quantitative trading engine with Binary Star adversarial protocol"
 readme = "README.md"
 license = {text = "MIT"}

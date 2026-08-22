@@ -123,7 +123,7 @@ regime_parameters:
   # --- Structural Anchors ---
   structural:
     # The 'Magnetic Field' range of the POC in ATR units.
-    poc_gravity_atr_distance: 3.5
+    poc_gravity_atr_distance: 4.0
     # Aggressive offset for 'Front-Running' institutional liquidity clusters.
     breakout_frontrun_atr: 0.2
 
