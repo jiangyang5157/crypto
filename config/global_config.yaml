@@ -165,6 +165,7 @@ sniper:
       directional_sanity: true       # 逆势无 CVD 确认 → 拒绝
       chaos_survival: true           # 混沌中追方向信号 → 拒绝
       min_active_non_trend: 1        # 非趋势regime中，dominant方向至少N个活跃信号。(方案D) 过滤单信号噪声
+      min_active_trend: 1            # 趋势regime中，dominant方向至少N个活跃信号。趋势惯性使单信号更可靠，故只设最低保险1
 
     # —— 信号置信度权重（可被 Evolution 进化）——
     # 设计原则：结构性/流动性信号 > 情绪/反向信号。

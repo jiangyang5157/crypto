@@ -3,7 +3,7 @@ import math
 from datetime import datetime, timezone, timedelta
 import pytest
 from src.sniper.trigger import (
-    SignalCard, SignalMemory, ConfluenceEngine, Direction,
+    SignalCard, SignalMemory, ConfluenceEngine, Direction, SniperTrigger,
 )
 
 
@@ -212,3 +212,104 @@ def test_sniper_trigger_initialization_with_symbol_override():
     assert thresholds.get("cvd_divergence_tick_delta") == 0.08
     assert trigger_btc.sniper_cfg.get("signal_stack", {}).get("trigger_threshold") == 0.36
 
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# Pre-AI Gate — min_active_trend / min_active_non_trend
+# ═══════════════════════════════════════════════════════════════════════════
+
+def _make_trigger(min_active_trend=None, min_active_non_trend=None):
+    gate = {}
+    if min_active_trend is not None:
+        gate['min_active_trend'] = min_active_trend
+    if min_active_non_trend is not None:
+        gate['min_active_non_trend'] = min_active_non_trend
+    strat = {
+        'regime_parameters': {
+            'trend': {'trend_intensity_strong': 0.6},
+            'micro_sentiment': {'cvd_intensity_threshold': 0.2},
+        },
+        'analysis_window': {'macro_context': {'time_interval': '1h'}},
+    }
+    glob = {
+        'sniper': {
+            'signal_stack': {
+                'trigger_threshold': 0.34,
+                'weights': {},
+                'decay': {
+                    'cvd_momentum': 15, 'cvd_divergence': 6, 'cvd_absorption': 15,
+                    'large_trade': 10, 'volatility_surge': 20, 'squeeze': 20,
+                    'boundary_test': 10, 'liquidation_hunt': 10,
+                    'positioning_extreme': 40, 'leader_sync': 8,
+                },
+                'gate': gate,
+            },
+        },
+    }
+    return SniperTrigger(strategy_cfg=strat, global_cfg=glob)
+
+
+def _gate_card(sub_type='large_trade', direction=Direction.BULLISH, strength=0.6):
+    return SignalCard(
+        signal_id=f'{sub_type}_1', sub_type=sub_type, direction=direction,
+        strength=strength, weight=0.55, timestamp=datetime.now(timezone.utc),
+        decay_half_life_minutes=10.0,
+    )
+
+
+def _gate_metrics(trend=0.5, cvd=0.1):
+    return {
+        'market_regime': {'trend_intensity': trend},
+        'sentiment_signals': {'cvd_intensity_ratio': cvd},
+    }
+
+
+class TestPreAIGate:
+
+    def test_trending_min_active_trend_1_passes_single_signal(self):
+        t = _make_trigger(min_active_trend=1)
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), [_gate_card()], Direction.BULLISH, 'trending')
+        assert result == 'PASS'
+
+    def test_trending_min_active_trend_2_blocks_single_signal(self):
+        t = _make_trigger(min_active_trend=2)
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), [_gate_card()], Direction.BULLISH, 'trending')
+        assert result == 'FAIL'
+        assert 'MIN_ACTIVE_TREND' in reason
+
+    def test_trending_min_active_trend_2_passes_two_signals(self):
+        t = _make_trigger(min_active_trend=2)
+        sigs = [_gate_card('large_trade'), _gate_card('cvd_momentum')]
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), sigs, Direction.BULLISH, 'trending')
+        assert result == 'PASS'
+
+    def test_trending_ignores_min_active_non_trend(self):
+        # min_active_trend unset (0) → trending not gated even though non_trend=2
+        t = _make_trigger(min_active_non_trend=2)
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), [_gate_card()], Direction.BULLISH, 'trending')
+        assert result == 'PASS'
+
+    def test_ranging_min_active_non_trend_2_blocks_single_signal(self):
+        t = _make_trigger(min_active_non_trend=2)
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), [_gate_card()], Direction.BULLISH, 'ranging')
+        assert result == 'FAIL'
+        assert 'MIN_ACTIVE_SIGNALS' in reason
+
+    def test_ranging_min_active_non_trend_2_passes_two_signals(self):
+        t = _make_trigger(min_active_non_trend=2)
+        sigs = [_gate_card('large_trade'), _gate_card('cvd_momentum')]
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), sigs, Direction.BULLISH, 'ranging')
+        assert result == 'PASS'
+
+    def test_ranging_ignores_min_active_trend(self):
+        # min_active_non_trend unset (0) → ranging not gated even though trend=2
+        t = _make_trigger(min_active_trend=2)
+        result, reason = t._run_pre_ai_gate(
+            _gate_metrics(), [_gate_card()], Direction.BULLISH, 'ranging')
+        assert result == 'PASS'

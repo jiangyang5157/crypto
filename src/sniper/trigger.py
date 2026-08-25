@@ -601,23 +601,29 @@ class SniperTrigger:
 
         # 3. Minimal active signal convergence — single-signal noise filter.
         # Non-trend regimes (ranging, squeeze, chaos) require at least
-        # min_active_non_trend signals in the trigger direction.
-        # Trending is exempt — trend inertia makes single signals more reliable.
+        # min_active_non_trend same-direction signals in the trigger direction.
+        # Trending requires at least min_active_trend — a bare sanity floor;
+        # trend inertia still makes single signals more reliable, so the bar
+        # is lower than non-trend regimes.
         # Squeeze signals (direction=NEUTRAL) are naturally excluded by the
         # direction filter — no explicit sub_type exclusion needed.
-        min_active = gate_cfg.get('min_active_non_trend', 0)
-        if min_active > 0 and regime != 'trending':
-            same_dir_active = [
-                s for s in signals
-                if s.direction == direction
-                and s.strength >= MIN_STACK_STRENGTH
-            ]
-            if len(same_dir_active) < min_active:
-                return "FAIL", (
-                    f"MIN_ACTIVE_SIGNALS: regime={regime} requires ≥{min_active} "
-                    f"signals in {direction.value} direction, "
-                    f"got {len(same_dir_active)}"
-                )
+        same_dir_active = [
+            s for s in signals
+            if s.direction == direction
+            and s.strength >= MIN_STACK_STRENGTH
+        ]
+        if regime == 'trending':
+            min_active = gate_cfg.get('min_active_trend', 0)
+            gate_tag = 'MIN_ACTIVE_TREND'
+        else:
+            min_active = gate_cfg.get('min_active_non_trend', 0)
+            gate_tag = 'MIN_ACTIVE_SIGNALS'
+        if min_active > 0 and len(same_dir_active) < min_active:
+            return "FAIL", (
+                f"{gate_tag}: regime={regime} requires ≥{min_active} "
+                f"signals in {direction.value} direction, "
+                f"got {len(same_dir_active)}"
+            )
 
         return "PASS", ""
 
