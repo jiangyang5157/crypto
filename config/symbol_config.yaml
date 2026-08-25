@@ -48,6 +48,7 @@ XAUTUSDT:
           stacked_break_count: 4
         gate:
           min_active_non_trend: 2   # 从 3 降回 2。XAUT 双信号触发频繁，放宽到 ≥2 个同向信号即放行，在非趋势行情保留更多 wake。
+          min_active_trend: 1
 
 BTCUSDT:
   precision_qty: 4           # Decimal places for order quantity
@@ -88,3 +89,4 @@ BTCUSDT:
           stacked_break_count: 4   # 提到 4 防止 ranging 40min cooldown 形同虚设。
         gate:
           min_active_non_trend: 2   # 从 3 降回 2。BTC 72% wakes 在 ranging，45% 是单信号，71% 结果 NEUTRAL。≥2 同向信号才放行，降低 LLM 浪费。
+          min_active_trend: 1
