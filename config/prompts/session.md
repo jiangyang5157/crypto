@@ -110,7 +110,7 @@ When history contains specific veto tags, apply these technical repair protocols
     → Execute Mean-Reversion DLE targeting POC.
   ELSE IF institutional flow is confirmed (`IS_TREND_STRONG`) or flow aligns:
     → IF full confirmation (`IS_TREND_STRONG` AND `HAS_CVD_MOMENTUM` AND `HAS_VOLUME_SURGE`): execute **Momentum Surge Entry** (per **MOMENTUM SURGE EXEMPTION**); Shallow Pullback DLE is PROHIBITED here.
-    → ELSE: Execute Shallow Pullback DLE if `IS_OVEREXTENDING` is FALSE; do not force a return to distal POC.
+    → ELSE: If `IS_OVEREXTENDING` is TRUE, output "NEUTRAL" (overextension without momentum is a trap); else execute Shallow Pullback DLE and do not force a return to distal POC.
   ELSE:
     → Output "NEUTRAL" (counter-trend or no valid entry path).
 
@@ -119,7 +119,7 @@ When history contains specific veto tags, apply these technical repair protocols
       → Output "NEUTRAL" (overextension without momentum is doomed).
     When `IS_TREND_STRONG` is TRUE:
       → IF entry already at `{max_entry_distance_atr}` ATR: output "NEUTRAL".
-      → ELSE: tighten entry toward current price and resubmit.
+      → ELSE: tighten entry toward current price and resubmit. If `IS_OVEREXTENDING` remains TRUE after this repair, output "NEUTRAL".
 
 - `[FLOW_VIOLATION]`: Polarity Pivot to align with `cvd_intensity_ratio` or abort to "NEUTRAL". DO NOT attempt to "deepen the entry" to absorb counter-flow; this is a falling knife trap.
 - `[VOLATILITY_CHOP]`: Treat as high-noise regime. Tighten `take_profit` to first structural boundary. If CVD flow is dominant, maintain directional bias. If flow direction is unclear, abort to "NEUTRAL".
